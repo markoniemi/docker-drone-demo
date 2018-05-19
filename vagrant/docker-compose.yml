@@ -1,0 +1,63 @@
+version: '2'
+
+# https://discourse.drone.io/t/couldnt-resolve-host-on-clone/281/21
+# https://forums.docker.com/t/resolved-service-name-resolution-broken-on-alpine-and-docker-1-11-1-cs1/19307/18
+# https://medium.com/@jonas.d.isberg/gogs-drone-using-docker-compose-49b50e0fc6f8
+# https://blog.maqpie.com/2017/03/21/build-and-deploy-applications-using-drone-ci-docker-and-ansible/
+# https://docs.docker.com/docker-for-windows/networking/#use-cases-and-workarounds
+# use host.docker.internal
+
+services:
+  drone:
+    container_name: drone
+    image: drone/drone:alpine
+    ports:
+      - 8000:8000
+      - 9000:9000
+    volumes:
+      - /vagrant/drone:/var/lib/drone/
+    restart: always
+    environment:
+      - DRONE_OPEN=true
+      - DRONE_HOST=http://drone-test:8000
+      - DRONE_ADMIN=niemimac
+      - DRONE_SECRET=DRONE_SECRET
+      - DRONE_GOGS=true
+      - DRONE_GOGS_URL=http://drone-test:3000
+      - DRONE_GOGS_PRIVATE_MODE=false
+      - DRONE_DEBUG=true
+
+  agent:
+    container_name: agent
+    image: drone/agent:0.8-alpine
+    command: agent
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_SERVER=drone-test:9000
+      - DRONE_SECRET=DRONE_SECRET
+      - DRONE_DEBUG=true
+
+  gogs:
+    container_name: gogs
+    image: gogs/gogs
+    ports:
+      - "10022:22"
+      - "3000:3000"
+    depends_on:
+      - gogsdb
+    environment:
+      - GOGS_CUSTOM=/data/gogs
+    volumes:
+      - /vagrant/gogs:/data
+
+  gogsdb:
+    container_name: gogsdb
+    image: onjin/alpine-postgres
+    environment:
+      - POSTGRES_USER=gogs
+      - POSTGRES_PASSWORD=gogs
+    volumes:
+      - /opt/gogsdb/data:/var/lib/postgresql/data
+       

@@ -1,0 +1,7 @@
+vagrant/.vagrant/
+vagrant/agent/
+vagrant/drone/
+vagrant/gogs/
+vagrant/gogsdb/
+!vagrant/gogs/gogs/conf/app.ini
+
