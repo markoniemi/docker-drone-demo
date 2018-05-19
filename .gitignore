@@ -1,7 +1,10 @@
 vagrant/.vagrant/
 vagrant/agent/
 vagrant/drone/
-vagrant/gogs/
+vagrant/gogs/git/
+vagrant/gogs/ssh/
+vagrant/gogs/gogs/data/
+vagrant/gogs/gogs/log/
 vagrant/gogsdb/
 !vagrant/gogs/gogs/conf/app.ini
 
