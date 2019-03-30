@@ -1,4 +1,4 @@
-version: '2'
+version: "3.7"
 
 # https://discourse.drone.io/t/couldnt-resolve-host-on-clone/281/21
 # https://forums.docker.com/t/resolved-service-name-resolution-broken-on-alpine-and-docker-1-11-1-cs1/19307/18
@@ -10,34 +10,42 @@ version: '2'
 services:
   drone:
     container_name: drone
-    image: drone/drone:alpine
+    image: drone/drone:1
     ports:
-      - 8000:8000
+      - 8000:80
+      - 443:443
       - 9000:9000
     volumes:
-      - /vagrant/drone:/var/lib/drone/
-    restart: always
-    environment:
-      - DRONE_OPEN=true
-      - DRONE_HOST=http://drone-test:8000
-      - DRONE_ADMIN=niemimac
-      - DRONE_SECRET=DRONE_SECRET
-      - DRONE_GOGS=true
-      - DRONE_GOGS_URL=http://drone-test:3000
-      - DRONE_GOGS_PRIVATE_MODE=false
-      - DRONE_DEBUG=true
-
-  agent:
-    container_name: agent
-    image: drone/agent:0.8-alpine
-    command: agent
-    restart: always
-    volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/drone:/vagrant/drone
+#    restart: always
     environment:
-      - DRONE_SERVER=drone-test:9000
-      - DRONE_SECRET=DRONE_SECRET
-      - DRONE_DEBUG=true
+      - DRONE_GIT_ALWAYS_AUTH=false
+      - DRONE_LOGS_DEBUG=true
+      - DRONE_GOGS=true
+      - DRONE_GOGS_SERVER=http://gogs:3000
+      - DRONE_RUNNER_CAPACITY=1
+      - DRONE_SERVER_HOST=drone:8000
+      - DRONE_SERVER_PROTO=http
+      - DRONE_TLS_AUTOCERT=false
+      - DRONE_ADMIN=niemimac
+      - DRONE_OPEN=true
+      - DRONE_SECRET=correct-horse-battery-staple
+      - DRONE_GOGS_PRIVATE_MODE=false
+      - DRONE_WEBHOOK_SECRET=correct-horse-battery-staple
+      - DRONE_WEBHOOK_SKIP_VERIFY=true
+
+#   agent:
+#     container_name: agent
+#     image: drone/agent:0.8-alpine
+#     command: agent
+#     restart: always
+#     volumes:
+#       - /var/run/docker.sock:/var/run/docker.sock
+#     environment:
+#       - DRONE_SERVER=drone-test:9000
+#       - DRONE_SECRET=DRONE_SECRET
+#       - DRONE_DEBUG=true
 
   gogs:
     container_name: gogs
@@ -60,4 +68,3 @@ services:
       - POSTGRES_PASSWORD=gogs
     volumes:
       - /opt/gogsdb/data:/var/lib/postgresql/data
-       

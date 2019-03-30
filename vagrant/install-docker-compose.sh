@@ -1,7 +1,8 @@
 #!/bin.sh
 # https://gist.github.com/bogdanRada/e5d0a7a3a649cbb363f0237e67b5169c
+# https://github.com/docker/compose/releases
 
-DOCKER_COMPOSE_VERSION=1.21.2
+DOCKER_COMPOSE_VERSION=1.24.0-rc3
 
 # Download docker-compose to the permanent storage
 echo 'Downloading docker-compose to the permanent VM storage...'
