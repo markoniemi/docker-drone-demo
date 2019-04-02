@@ -6,6 +6,8 @@ version: "3.7"
 # https://blog.maqpie.com/2017/03/21/build-and-deploy-applications-using-drone-ci-docker-and-ansible/
 # https://docs.docker.com/docker-for-windows/networking/#use-cases-and-workarounds
 # use host.docker.internal
+# how to use cache
+# https://github.com/drone-plugins/drone-docker/issues/172
 
 services:
   drone:
@@ -17,35 +19,44 @@ services:
       - 9000:9000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/drone:/vagrant/drone
-#    restart: always
+      - /vagrant/drone:/var/lib/drone
     environment:
-      - DRONE_GIT_ALWAYS_AUTH=false
-      - DRONE_LOGS_DEBUG=true
-      - DRONE_GOGS=true
-      - DRONE_GOGS_SERVER=http://gogs:3000
-      - DRONE_RUNNER_CAPACITY=1
-      - DRONE_SERVER_HOST=drone:8000
-      - DRONE_SERVER_PROTO=http
       - DRONE_TLS_AUTOCERT=false
+      - DRONE_AGENTS_ENABLED=false
+      - DRONE_GOGS_SERVER=http://gogs:3000
+      - DRONE_RPC_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
+      - DRONE_SERVER_HOST=192.168.50.100:8000
+      - DRONE_SERVER_PROTO=http
+      - DRONE_GIT_ALWAYS_AUTH=false
+      - DRONE_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
       - DRONE_ADMIN=niemimac
-      - DRONE_OPEN=true
-      - DRONE_SECRET=correct-horse-battery-staple
-      - DRONE_GOGS_PRIVATE_MODE=false
-      - DRONE_WEBHOOK_SECRET=correct-horse-battery-staple
-      - DRONE_WEBHOOK_SKIP_VERIFY=true
+      - DRONE_USER_CREATE=username:niemimac,admin:true
+      - DRONE_LOGS_DEBUG=true
+      - DRONE_DEBUG=true
+      - DRONE_RUNNER_CAPACITY=2
 
-#   agent:
-#     container_name: agent
-#     image: drone/agent:0.8-alpine
-#     command: agent
-#     restart: always
-#     volumes:
-#       - /var/run/docker.sock:/var/run/docker.sock
-#     environment:
-#       - DRONE_SERVER=drone-test:9000
-#       - DRONE_SECRET=DRONE_SECRET
-#       - DRONE_DEBUG=true
+#      - DRONE_GIT_ALWAYS_AUTH=false
+#      - DRONE_GOGS=true
+#      - DRONE_TLS_AUTOCERT=false
+#      - DRONE_ADMIN=niemimac
+#      - DRONE_OPEN=true
+#      - DRONE_SECRET=correct-horse-battery-staple
+#      - DRONE_GOGS_PRIVATE_MODE=false
+#      - DRONE_WEBHOOK_SECRET=correct-horse-battery-staple
+#      - DRONE_WEBHOOK_SKIP_VERIFY=true
+
+#  agent:
+#    container_name: agent
+#    image: drone/agent:1
+#    command: agent
+#    restart: always
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    environment:
+#      - DRONE_SERVER=192.168.50.100:9000
+#      - DRONE_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
+#      - DRONE_DEBUG=true
+#      - DRONE_RPC_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
 
   gogs:
     container_name: gogs
@@ -53,18 +64,18 @@ services:
     ports:
       - "10022:22"
       - "3000:3000"
-    depends_on:
-      - gogsdb
+#    depends_on:
+#      - gogsdb
     environment:
       - GOGS_CUSTOM=/data/gogs
     volumes:
       - /vagrant/gogs:/data
 
-  gogsdb:
-    container_name: gogsdb
-    image: onjin/alpine-postgres
-    environment:
-      - POSTGRES_USER=gogs
-      - POSTGRES_PASSWORD=gogs
-    volumes:
-      - /opt/gogsdb/data:/var/lib/postgresql/data
+#  gogsdb:
+#    container_name: gogsdb
+#    image: onjin/alpine-postgres
+#    environment:
+#      - POSTGRES_USER=gogs
+#      - POSTGRES_PASSWORD=gogs
+#    volumes:
+#      - /vagrant/gogsdb/data:/var/lib/postgresql/data
