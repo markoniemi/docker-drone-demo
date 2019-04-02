@@ -19,7 +19,8 @@ services:
       - 9000:9000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /vagrant/drone:/var/lib/drone
+      - /vagrant/drone:/data
+      - /vagrant/drone/cache:/cache
     environment:
       - DRONE_TLS_AUTOCERT=false
       - DRONE_AGENTS_ENABLED=false
