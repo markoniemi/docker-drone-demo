@@ -26,7 +26,7 @@ services:
       - DRONE_AGENTS_ENABLED=false
       - DRONE_GOGS_SERVER=http://gogs:3000
       - DRONE_RPC_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
-      - DRONE_SERVER_HOST=192.168.50.100:8000
+      - DRONE_SERVER_HOST=drone:80
       - DRONE_SERVER_PROTO=http
       - DRONE_GIT_ALWAYS_AUTH=false
       - DRONE_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
@@ -35,6 +35,9 @@ services:
       - DRONE_LOGS_DEBUG=true
       - DRONE_DEBUG=true
       - DRONE_RUNNER_CAPACITY=2
+      - DRONE_RUNNER_NETWORKS=drone-network
+    networks:
+      - drone-network
 
 #      - DRONE_GIT_ALWAYS_AUTH=false
 #      - DRONE_GOGS=true
@@ -71,6 +74,8 @@ services:
       - GOGS_CUSTOM=/data/gogs
     volumes:
       - /vagrant/gogs:/data
+    networks:
+      - drone-network
 
 #  gogsdb:
 #    container_name: gogsdb
@@ -80,3 +85,7 @@ services:
 #      - POSTGRES_PASSWORD=gogs
 #    volumes:
 #      - /vagrant/gogsdb/data:/var/lib/postgresql/data
+
+networks:
+  drone-network:
+    name: drone-network
