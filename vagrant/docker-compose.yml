@@ -18,49 +18,43 @@ services:
       - 443:443
       - 9000:9000
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - /vagrant/drone:/data
-      - /vagrant/drone/cache:/cache
+    networks:
+      - drone-network
     environment:
       - DRONE_TLS_AUTOCERT=false
-      - DRONE_AGENTS_ENABLED=false
+      - DRONE_AGENTS_ENABLED=true
       - DRONE_GOGS_SERVER=http://gogs:3000
-      - DRONE_RPC_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
       - DRONE_SERVER_HOST=drone:80
       - DRONE_SERVER_PROTO=http
       - DRONE_GIT_ALWAYS_AUTH=false
       - DRONE_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
+      - DRONE_RPC_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
       - DRONE_ADMIN=niemimac
       - DRONE_USER_CREATE=username:niemimac,admin:true
       - DRONE_LOGS_DEBUG=true
       - DRONE_DEBUG=true
-      - DRONE_RUNNER_CAPACITY=2
-      - DRONE_RUNNER_NETWORKS=drone-network
+
+  agent:
+    container_name: agent
+    image: drone/agent:1
+    command: agent
+    restart: always
+    depends_on:
+      - drone
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /vagrant/agent/cache:/cache
     networks:
       - drone-network
-
-#      - DRONE_GIT_ALWAYS_AUTH=false
-#      - DRONE_GOGS=true
-#      - DRONE_TLS_AUTOCERT=false
-#      - DRONE_ADMIN=niemimac
-#      - DRONE_OPEN=true
-#      - DRONE_SECRET=correct-horse-battery-staple
-#      - DRONE_GOGS_PRIVATE_MODE=false
-#      - DRONE_WEBHOOK_SECRET=correct-horse-battery-staple
-#      - DRONE_WEBHOOK_SKIP_VERIFY=true
-
-#  agent:
-#    container_name: agent
-#    image: drone/agent:1
-#    command: agent
-#    restart: always
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    environment:
-#      - DRONE_SERVER=192.168.50.100:9000
-#      - DRONE_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
-#      - DRONE_DEBUG=true
-#      - DRONE_RPC_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
+    environment:
+      - DRONE_RPC_SERVER=http://drone
+      - DRONE_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
+      - DRONE_RPC_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
+      - DRONE_DEBUG=true
+      - DRONE_LOGS_DEBUG=true
+      - DRONE_RUNNER_NETWORKS=drone-network
+      - DRONE_RUNNER_VOLUMES=/vagrant/agent/cache:/cache
 
   gogs:
     container_name: gogs
@@ -68,8 +62,8 @@ services:
     ports:
       - "10022:22"
       - "3000:3000"
-#    depends_on:
-#      - gogsdb
+    depends_on:
+      - gogsdb
     environment:
       - GOGS_CUSTOM=/data/gogs
     volumes:
@@ -77,14 +71,16 @@ services:
     networks:
       - drone-network
 
-#  gogsdb:
-#    container_name: gogsdb
-#    image: onjin/alpine-postgres
-#    environment:
-#      - POSTGRES_USER=gogs
-#      - POSTGRES_PASSWORD=gogs
-#    volumes:
-#      - /vagrant/gogsdb/data:/var/lib/postgresql/data
+  gogsdb:
+    container_name: gogsdb
+    image: onjin/alpine-postgres
+    environment:
+      - POSTGRES_USER=gogs
+      - POSTGRES_PASSWORD=gogs
+    volumes:
+      - /vagrant/gogsdb/data:/var/lib/postgresql/data
+    networks:
+      - drone-network
 
 networks:
   drone-network:
