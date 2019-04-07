@@ -82,6 +82,24 @@ services:
     networks:
       - drone-network
 
+  relay:
+  	# http://l73x60cmkzxmoz0s04sb1w.webrelay.io/
+    container_name: relay
+    image: webhookrelay/webhookrelayd:latest
+    command:
+      - --mode 
+      - tunnel 
+      - -t
+      - drone
+    restart: always
+    depends_on:
+      - drone
+    networks:
+      - drone-network
+    environment: 
+      - KEY=21c29105-a97b-4b25-b6f0-00d48b868c1f
+      - SECRET=08byciiQlmFg
+      
 networks:
   drone-network:
     name: drone-network
