@@ -22,17 +22,21 @@ services:
     networks:
       - drone-network
     environment:
+      - DRONE_SERVER_HOST=l73x60cmkzxmoz0s04sb1w.webrelay.io
+      - DRONE_SERVER_PROTO=http
+      - DRONE_GOGS_SERVER=http://gogs:3000
+      - DRONE_GITHUB_SERVER=https://github.com
+      - DRONE_GITHUB_CLIENT_ID=55e372ca317c085aaafc
+      - DRONE_GITHUB_CLIENT_SECRET=161c364cdc4880b760ec273f56031988f7b2d722
       - DRONE_TLS_AUTOCERT=false
       - DRONE_AGENTS_ENABLED=true
-      - DRONE_GOGS_SERVER=http://gogs:3000
-      - DRONE_SERVER_HOST=drone:80
-      - DRONE_SERVER_PROTO=http
       - DRONE_GIT_ALWAYS_AUTH=false
       - DRONE_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
       - DRONE_RPC_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
-      - DRONE_ADMIN=niemimac
-      - DRONE_USER_CREATE=username:niemimac,admin:true
-      - DRONE_LOGS_DEBUG=true
+      - DRONE_USER_CREATE=username:markoniemi,admin:true
+      - DRONE_LOGS_TEXT=true
+      - DRONE_LOGS_PRETTY=true
+      - DRONE_LOGS_COLOR=true      
       - DRONE_DEBUG=true
 
   agent:
@@ -53,6 +57,9 @@ services:
       - DRONE_RPC_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
       - DRONE_DEBUG=true
       - DRONE_LOGS_DEBUG=true
+      - DRONE_LOGS_TEXT=true
+      - DRONE_LOGS_PRETTY=true
+      - DRONE_LOGS_COLOR=true      
       - DRONE_RUNNER_NETWORKS=drone-network
       - DRONE_RUNNER_VOLUMES=/vagrant/agent/cache:/cache
 
@@ -83,7 +90,7 @@ services:
       - drone-network
 
   relay:
-  	# http://l73x60cmkzxmoz0s04sb1w.webrelay.io/
+    # http://l73x60cmkzxmoz0s04sb1w.webrelay.io/
     container_name: relay
     image: webhookrelay/webhookrelayd:latest
     command:
