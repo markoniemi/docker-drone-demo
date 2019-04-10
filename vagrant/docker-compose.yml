@@ -1,30 +1,17 @@
 version: "3.7"
 
-# https://discourse.drone.io/t/couldnt-resolve-host-on-clone/281/21
-# https://forums.docker.com/t/resolved-service-name-resolution-broken-on-alpine-and-docker-1-11-1-cs1/19307/18
-# https://medium.com/@jonas.d.isberg/gogs-drone-using-docker-compose-49b50e0fc6f8
-# https://blog.maqpie.com/2017/03/21/build-and-deploy-applications-using-drone-ci-docker-and-ansible/
-# https://docs.docker.com/docker-for-windows/networking/#use-cases-and-workarounds
-# use host.docker.internal
-# how to use cache
-# https://github.com/drone-plugins/drone-docker/issues/172
-
 services:
   drone:
     container_name: drone
     image: drone/drone:1
     ports:
-      - 8000:80
+      - 80:80
       - 443:443
-      - 9000:9000
     volumes:
       - /vagrant/drone:/data
-    networks:
-      - drone-network
     environment:
       - DRONE_SERVER_HOST=l73x60cmkzxmoz0s04sb1w.webrelay.io
       - DRONE_SERVER_PROTO=http
-      - DRONE_GOGS_SERVER=http://gogs:3000
       - DRONE_GITHUB_SERVER=https://github.com
       - DRONE_GITHUB_CLIENT_ID=55e372ca317c085aaafc
       - DRONE_GITHUB_CLIENT_SECRET=161c364cdc4880b760ec273f56031988f7b2d722
@@ -49,8 +36,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /vagrant/agent/cache:/cache
-    networks:
-      - drone-network
     environment:
       - DRONE_RPC_SERVER=http://drone
       - DRONE_SECRET=27b4b3b58a94a4ab193aa98b9c8738a1
@@ -60,37 +45,9 @@ services:
       - DRONE_LOGS_TEXT=true
       - DRONE_LOGS_PRETTY=true
       - DRONE_LOGS_COLOR=true      
-      - DRONE_RUNNER_NETWORKS=drone-network
       - DRONE_RUNNER_VOLUMES=/vagrant/agent/cache:/cache
 
-  gogs:
-    container_name: gogs
-    image: gogs/gogs
-    ports:
-      - "10022:22"
-      - "3000:3000"
-    depends_on:
-      - gogsdb
-    environment:
-      - GOGS_CUSTOM=/data/gogs
-    volumes:
-      - /vagrant/gogs:/data
-    networks:
-      - drone-network
-
-  gogsdb:
-    container_name: gogsdb
-    image: onjin/alpine-postgres
-    environment:
-      - POSTGRES_USER=gogs
-      - POSTGRES_PASSWORD=gogs
-    volumes:
-      - /vagrant/gogsdb/data:/var/lib/postgresql/data
-    networks:
-      - drone-network
-
   relay:
-    # http://l73x60cmkzxmoz0s04sb1w.webrelay.io/
     container_name: relay
     image: webhookrelay/webhookrelayd:latest
     command:
@@ -101,12 +58,6 @@ services:
     restart: always
     depends_on:
       - drone
-    networks:
-      - drone-network
     environment: 
       - KEY=21c29105-a97b-4b25-b6f0-00d48b868c1f
       - SECRET=08byciiQlmFg
-      
-networks:
-  drone-network:
-    name: drone-network
